@@ -1,0 +1,131 @@
+<!-- Copyright 2021 Newcastle University.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License. -->
+
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+/* open-sans-regular - latin */
+@font-face {
+  font-family: 'Open Sans';
+}
+
+body {font-family: Open Sans;}
+
+/* The Modal (background) */
+.modal {
+  display: block; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  padding-top: 200px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 40%;
+  height: 10%;
+}
+
+</style>
+<title>TVS Data Explorer</title>
+<body>
+    
+    <div id="title">
+        <h1>TVS Data Explorer: </h1>
+        <a href="https://www.mobilise-d.eu/" target="_blank"><img src="Mobilie-D_log_grey.png" style="height:25px"></a>
+        <a href="https://www.ncl.ac.uk/" target="_blank"><img src="Newcastle_University_logo_grey.png" style="height:40px"></a>
+    </div>
+
+    <!-- The Modal -->
+    <div id="myModal" class="modal" style="display: none">
+
+      <!-- Modal content -->
+      <div class="modal-content">
+        <p>Load the dataset</p>
+        <input type="file" id="uploader">
+      </div>
+
+    </div>
+
+</body>
+    
+<link rel="stylesheet" href="css/style.css"></link>
+<link href="https://fonts.googleapis.com/css2?family=Bree+Serif&family=Open+Sans&display=swap" rel="stylesheet">
+<link href="https://use.fontawesome.com/releases/v5.15.3/css/all.css" rel="stylesheet"/>
+
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3-color@3"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3-interpolate@3"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3-scale-chromatic@3"></script>
+<script src="js/lib/render-queue.js"></script>
+
+<script src="js/dataFormatReader.js"></script>
+<script src="js/panelBehaviour/parallelCoordinates.js"></script>
+<script src="js/panelBehaviour/blandAltmanPlot.js"></script>
+<script src="js/panelBehaviour/correlationPlot.js"></script>
+<script src="js/panelBehaviour/datumPanelBehaviour.js"></script>
+<script src="js/panelBehaviour/visibilityPanelBehaviour.js"></script>
+<script src="js/panelBehaviour/informationPanelBehaviour.js"></script>
+<script src="js/panelBehaviour/legendPanelBehaviour.js"></script>
+<script src="js/panelBehaviour/histogramPlot1.js"></script>
+<script src="js/panelBehaviour/histogramPlot2.js"></script>
+<script src="js/main.js"></script>
+<script>
+
+function upload_button(el, callback) {
+   var uploader = document.getElementById(el);  
+   var reader = new FileReader();
+
+   reader.onload = function(e) {
+       var contents = e.target.result;
+       callback(contents);
+   };
+
+   uploader.addEventListener("change", handleFiles, false);  
+
+   function handleFiles() {
+
+       var modal = document.getElementById("myModal");
+       modal.style.display = "none";
+
+      //  d3.select("#table").text("loading...");
+      var file = this.files[0];
+
+      var h1 = d3.select("h1");
+      h1.text(h1.text() + " " + file.name);
+
+      reader.readAsText(file);
+   };
+};
+
+// Check for the various File API support.
+if (window.File && window.FileReader && window.FileList && window.Blob) {
+   upload_button("uploader", uploadData);
+}
+else {
+   alert('The File APIs are not fully supported in this browser.');
+}
+
+</script>

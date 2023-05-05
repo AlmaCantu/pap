@@ -1,0 +1,335 @@
+/* bree-serif-regular - latin */
+@font-face {
+  font-family: 'Bree Serif';
+  font-style: normal;
+  font-weight: 400;
+}
+
+/* open-sans-regular - latin */
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 400;
+}
+
+body {
+  min-width: 760px;
+  background-color: #F6F6F6;
+  font-family: 'Open Sans';
+  overflow: hidden;
+}
+
+h1, h2, h3, h4 {
+  font-family: 'Bree Serif';
+  font-weight: normal;
+  margin: 0 0 5px 0;
+}
+
+#title {
+  height: 50px;
+}
+
+#title h1 {
+  float: left;
+  margin-left: 10px;
+  margin-top: 15px;
+}
+
+#title a {
+  float: right;
+  margin-top: 5px;
+  margin-bottom: 2px;
+  margin-right: 5px;
+  margin-left: 5px;
+}
+
+
+p, text, div, select {
+  font-size: 12px;
+  font-family: 'Open Sans';
+}
+
+h1 {
+  font-size: 16px;
+}
+
+h2 {
+  font-size: 14px;
+}
+
+h3 {
+  font-size: 12px;
+}
+
+h4 {
+  font-size: 10px;
+}
+
+
+ul {
+  clear: both;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+li {
+  float: left;
+}
+
+li:last-child {
+  float: right;
+}
+
+/* #coloredDimensionLabel {
+  font-size: 12px;
+  margin: 0 0 5px 0;
+} */
+
+.arrow {
+  font-size: 11px;
+  cursor: move;
+}
+
+.canvas {
+    background-color: #FFF;
+    margin: 10px;
+    padding: 10px;
+    float: left;
+    float: top;
+}
+
+/* #visibleDimensionsContainer{
+    overflow-y: scroll;
+    overflow-x: hidden;
+    height: 380px
+} */
+
+.hidden {
+    display: none;
+}
+
+.axis {
+  cursor: move;
+}
+
+.axis .title, .dimension .title {
+  transform: rotate(-21deg) translate(-5px,-6px);
+  fill: #222;
+}
+
+.axis .title:hover {
+  fill: #097DB3
+}
+
+.axis line,
+.axis path {
+  fill: none;
+  stroke: #555;
+  stroke-width: 1px;
+}
+
+.axis .tick text {
+  fill: #222;
+  pointer-events: none;
+}
+
+.axis.selected path,
+.axis.selected line {
+  fill: none;
+  stroke: #222;
+  stroke-width: 1px;
+}
+
+text {
+    fill: #222;
+}
+
+/*.axis.selected .title {
+  font-weight: bold;
+}*/
+
+.brush .extent {
+  fill-opacity: .3;
+  stroke: #fff;
+  stroke-width: 1px;
+}
+
+pre {
+  width: 100%;
+  height: 300px;
+  margin: 6px 12px;
+  tab-size: 40;
+  font-size: 10px;
+  overflow: auto;
+}
+
+.button{
+  cursor: default;
+}
+
+/*
+.button:hover{
+  fill: #097db3;
+}
+*/
+
+/* .arrow-up {
+  width: 0; 
+  height: 0; 
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  
+  border-bottom: 8px solid black;
+}
+
+.arrow-down {
+  width: 0; 
+  height: 0; 
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  
+  border-top: 8px solid black;
+} */
+
+line {
+  line-height: 200%;
+}
+
+/* Icon interaction */
+
+.point {
+  r: 2;
+  stroke: none
+}
+.point:hover {
+  r: 6;
+  stroke: none
+}
+
+.point.selected {
+  r: 6;
+  stroke: black
+}
+
+.button text{
+  font-size: 0.8em;
+  fill: #ccc;
+}
+
+.button rect{
+  fill: #fff;
+  stroke: #ccc;
+}
+
+.button.active text{
+  fill: #097DB3;
+}
+
+.button.active rect{
+  stroke: #097DB3;
+}
+
+.button.active:hover text{
+  fill: #FFC54E;
+}
+
+.button.active:hover rect{
+  stroke: #FFC54E;
+}
+
+.button.selected text{
+  fill: #FFF;
+}
+
+.button.selected.active text{
+  fill: #FFF;
+}
+
+.button circle{
+  r: 8;
+  fill: #FFF;
+}
+
+.button.active circle{
+  fill: #FFF;
+}
+
+.button.selected circle{
+  fill: #CCC;
+}
+
+.button.selected.active circle{
+  fill: #097DB3;
+}
+
+.button.selected.active:hover circle{
+  fill: #FFC54E;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+input[type="number"] {
+  font-family: 'Open Sans';
+  background: transparent;
+  border: none;
+}
+
+input[type="number"]:hover, input[type="number"]:focus {
+  background: #fff;
+  border: solid;
+  border-color: #ccc;
+  border-width: thin;
+  outline: none;
+}
+
+/* input[type="number"].focused {
+  background: #fff;
+  border: solid;
+  border-color: #ccc;
+  border-width: thin;
+  outline: none;
+} */
+
+th {
+  font-family: 'Bree Serif';
+  font-weight: normal;
+}
+
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+
+/* .path {
+  r: 2;
+  stroke: none
+} */
+
+.path.selected {
+  /* paint-order: stroke fill; */
+  stroke-width: 1.8;
+  opacity: 1;
+  /* stroke: black; */
+}
+
+.tooltip {
+  position: absolute;
+  /* width: 120px; */
+  background-color: rgba(255, 255, 255, 0.5);
+  color: #111;
+  padding: 5px 0;
+  border-radius: 6px;
+}
+
+th, td {
+  padding-right: 3px;
+  padding-left: 3px;
+}

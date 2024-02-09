@@ -126,11 +126,11 @@ function InformationPanelBehaviour () {
                 .append('xhtml:table')
                     .attr("class", "table");
 
-        var categories = (coloredDimension.property == "referential" ? coloredDimension.domain : []);
+        var categories = (coloredDimension.property == "categorical" ? coloredDimension.domain : []);
 
         var nbColumns = categories.length;
 
-        var rowDimensions = dimensions.filter(dim => dim.isVisible && (dim.property == "characteristic")).sort((a, b) => a.order - b.order);
+        var rowDimensions = dimensions.filter(dim => dim.isVisible && (dim.property == "quantitative")).sort((a, b) => a.order - b.order);
 
         var summaryData;
         const f = d3.format(".2f");
@@ -275,7 +275,7 @@ function InformationPanelBehaviour () {
             filterData.push(["variable", "categories", "min", "max"]);
             d3.map(dimensions.filter(dim => dim.isVisible), function(dim) {
                 if(dim.brush.length != 0)
-                    if(dim.property == "referential")
+                    if(dim.property == "categorical")
                         filterData.push([dim.label ? dim.label : dim.key, dim.brush.join(" "), "", ""]);
                     else
                         filterData.push([dim.label ? dim.label : dim.key, "", dim.brush[0], dim.brush[1]]);

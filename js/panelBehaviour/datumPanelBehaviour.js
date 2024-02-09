@@ -89,7 +89,7 @@ function DatumPanelBehaviour () {
                             return (+datum[dim.key] <= dim.max ? 'black' : 'red');
                         return 'black';
                     })
-                    .text(dim => dim.type == "quantitative" ? f(+datum[dim.key]) : datum[dim.key]);
+                    .text(dim => (dim.property == "quantitative") ? f(+datum[dim.key]) : datum[dim.key]);
     }
     
     datumPanelBehaviour.selectedDataChanged = function () {

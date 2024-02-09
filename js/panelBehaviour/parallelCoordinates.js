@@ -77,8 +77,8 @@ function ParallelCoordinates() {
         
         _renderLines = renderQueue(drawLine).rate(500);
     
-        _dimensionOrder["referential"] = 0;
-        _dimensionOrder["characteristic"] = 1;
+        _dimensionOrder["categorical"] = 0;
+        _dimensionOrder["quantitative"] = 1;
     }
 
     parallelCoordinates.initialize = function () {
@@ -150,7 +150,7 @@ function ParallelCoordinates() {
             onAxisMoved();
             // updateAxesPositionData();
 
-            // if ((axis.dimension.property == "referential") && (axis.dimension.axis.position == 0))
+            // if ((axis.dimension.property == "categorical") && (axis.dimension.axis.position == 0))
             //     onColoredDimensionChange(axis.dimension.key);
             // else {
             //     updateDataAndDomains();
@@ -181,7 +181,7 @@ function ParallelCoordinates() {
 
         if (brushExtend != null) {
 
-            if (axis.dimension.property == "referential") {
+            if (axis.dimension.property == "categorical") {
             
                 var valueExtend = invertYScale(axis, brushExtend);
 
@@ -354,8 +354,8 @@ function ParallelCoordinates() {
     // parallelCoordinates.selectedDimensionsChanged = function () {
         
     //     // Update inputs fields
-    //     d3.selectAll(".topValue").filter(axis => axis.dimension.isVisible && (axis.dimension.property == "characteristic")).attr("value", axis => axis.order == "up" ? f(axis.maxValue) : f(axis.minValue));
-    //     d3.selectAll(".bottomValue").filter(axis => axis.dimension.isVisible && (axis.dimension.property == "characteristic")).attr("value", axis => axis.order == "up" ? f(axis.minValue) : f(axis.maxValue));
+    //     d3.selectAll(".topValue").filter(axis => axis.dimension.isVisible && (axis.dimension.property == "quantitative")).attr("value", axis => axis.order == "up" ? f(axis.maxValue) : f(axis.minValue));
+    //     d3.selectAll(".bottomValue").filter(axis => axis.dimension.isVisible && (axis.dimension.property == "quantitative")).attr("value", axis => axis.order == "up" ? f(axis.minValue) : f(axis.maxValue));
         
     //     // Update selected dimensions buttons
     //     _selectDim1Buttons.filter(axis => selectedDimension1 && axis.dimension.isVisible).classed("selected", axis => axis.key == selectedDimension1.key);
@@ -446,7 +446,7 @@ function ParallelCoordinates() {
             .on("end", onDragEnd));
 
 
-        if (coloredDimension.property == "referential") {
+        if (coloredDimension.property == "categorical") {
                         
             getRefAxes().each(function (a) {
                 if (a.key == coloredDimension.key)
@@ -473,7 +473,8 @@ function ParallelCoordinates() {
 
             // console.log(dim);
 
-            axis.key = (dim.nature == "measured" ? dim.key : dim.parameters.mean);
+            // axis.key = (dim.nature == "measured" ? dim.key : dim.parameters.mean);
+            axis.key = dim.key;
             axis.label = (dim.label ? dim.label : dim.key);
             axis.dimension = dim;
             dim.axis = axis;
@@ -481,7 +482,7 @@ function ParallelCoordinates() {
             axis.dragDisabled = false;
             // axis.domain = dim.domain;
 
-            if (axis.dimension.property == "referential") {
+            if (axis.dimension.property == "categorical") {
 
                 axis.averaged = false;
                 // if (dim.type == "nominal" || dim.type == "ordinal")
@@ -586,7 +587,7 @@ function ParallelCoordinates() {
 
         // _refCategories = [];
 
-        _gAxes.filter(a => (a.dimension.isVisible && a.dimension.property == "referential"))
+        _gAxes.filter(a => (a.dimension.isVisible && a.dimension.property == "categorical"))
             .each(function (axis) {
 
                 axis.domain = axis.dimension.domain;
@@ -612,9 +613,9 @@ function ParallelCoordinates() {
                 //     .range([0, _height - scaleMargin]);
 
         });
-        updateReferentialAxesYScale(treeData, _height, scaleMargin);
+        updateCategoricalAxesYScale(treeData, _height, scaleMargin);
 
-        _gAxes.filter(a => (a.dimension.isVisible && a.dimension.property == "characteristic"))
+        _gAxes.filter(a => (a.dimension.isVisible && a.dimension.property == "quantitative"))
             .each(function (axis) {
 
                 var nbNotMissing = scaledDataset.filter(d => d[axis.key]).length;
@@ -656,11 +657,9 @@ function ParallelCoordinates() {
             .append("g")
             .attr("class", "scale")
             .each(function(a) {
-                switch(a.dimension.type) {
-                    case "nominal":
-                        drawCategoricalAxis(d3.select(this), a);
-                        break;
-                    case "ordinal":
+                switch(a.dimension.property) {
+                    case "categorical":
+
                         drawCategoricalAxis(d3.select(this), a);
                         break;
                     case "quantitative":
@@ -680,7 +679,7 @@ function ParallelCoordinates() {
             .attr("class", "brush")
             .each(function(a) {
                 d3.select(this).call(a.brush = d3.brushY()
-                    .extent([[-10, 0], [10, a.dimension.property == "referential" ? _height : a.y1Axis]])
+                    .extent([[-10, 0], [10, a.dimension.property == "categorical" ? _height : a.y1Axis]])
                     .on("start", onBrushStart)
                     .on("brush", onBrush)
                     .on("end", onBrushEnd)
@@ -694,7 +693,7 @@ function ParallelCoordinates() {
 
     }
 
-    function updateReferentialAxesYScale(dataTree, totalSize, margin) {
+    function updateCategoricalAxesYScale(dataTree, totalSize, margin) {
 
         var catSize = {};
 
@@ -717,7 +716,7 @@ function ParallelCoordinates() {
         }
         dataTree.nodes.forEach(child => rec(child));
 
-        _gAxes.filter(a => (a.dimension.isVisible && a.dimension.property == "referential"))
+        _gAxes.filter(a => (a.dimension.isVisible && a.dimension.property == "categorical"))
             .each(function (axis) {
 
             // var isReversed = (axis.order == "up");
@@ -796,12 +795,12 @@ function ParallelCoordinates() {
         
         var scaledDataset = currentData;
 
-        _gAxes.filter(a => a.dimension.isVisible && a.dimension.property == "characteristic").append("g")
+        _gAxes.filter(a => a.dimension.isVisible && a.dimension.property == "quantitative").append("g")
             .each(function(axis) {
 
                 if (axis.y0Bar != axis.y1Bar) {
 
-                    if(coloredDimension.property == "referential") {
+                    if(coloredDimension.property == "categorical") {
 
                         var missingDataset = scaledDataset.filter(d => !d[axis.key]);
                         var nbMissingTotal = missingDataset.length;
@@ -902,7 +901,7 @@ function ParallelCoordinates() {
 
     function updateLinesDisplay() {
 
-        dimensions.filter(dim => dim.isVisible && dim.property == "characteristic")
+        dimensions.filter(dim => dim.isVisible && dim.property == "quantitative")
             .forEach(dim => _tempYPositions[dim.key] = _height);
 
         var refAxes = getRefAxes().data();
@@ -996,7 +995,7 @@ function ParallelCoordinates() {
     
     function addDomainInputs() {
 
-        var foreignObject = _gAxes.append("g").filter(a => (a.dimension.property == "characteristic"))
+        var foreignObject = _gAxes.append("g").filter(a => (a.dimension.property == "quantitative"))
             .append("foreignObject")
                 .attr("x", "5")
                 .attr("y", "0")
@@ -1154,7 +1153,7 @@ function ParallelCoordinates() {
             axis.dragDisabled = false;
         }
 
-        var iconButton = _gAxes.filter(a => (a.dimension.property == "characteristic"))
+        var iconButton = _gAxes.filter(a => (a.dimension.property == "quantitative"))
             .append("g")
             .attr("class", "button")
             .on("mouseover", onHover)
@@ -1188,7 +1187,7 @@ function ParallelCoordinates() {
             axis.dragDisabled = false;
         }
 
-        var iconButton = _gAxes.filter(a => (a.dimension.property == "characteristic"))
+        var iconButton = _gAxes.filter(a => (a.dimension.property == "quantitative"))
             .append("g")
             .attr("class", "button")
             .on("mouseover", onHover)
@@ -1250,7 +1249,7 @@ function ParallelCoordinates() {
         
         g.selectAll(".category").remove();
 
-        var nestedDimensions = dimensions.filter(dim => (dim.property == "referential" && dim.isNested));
+        var nestedDimensions = dimensions.filter(dim => (dim.property == "categorical" && dim.isNested));
 
         if (nestedDimensions.length != 0 && !axis.dimension.isNested)
             return;
@@ -1295,14 +1294,14 @@ function ParallelCoordinates() {
     }
     
     function getRefAxes() {
-        return _gAxes.filter(a => (a.dimension.isVisible && (a.dimension.property == "referential")))
+        return _gAxes.filter(a => (a.dimension.isVisible && (a.dimension.property == "categorical")))
             .sort(function(a, b) {
                 return d3.ascending(a.position, b.position)
             });
     }
     
     function getCharAxes() {
-        return _gAxes.filter(a => (a.dimension.isVisible && a.dimension.property == "characteristic"))
+        return _gAxes.filter(a => (a.dimension.isVisible && a.dimension.property == "quantitative"))
             .sort(function(a, b) {
                 return d3.ascending(a.position, b.position)
             });
@@ -1334,10 +1333,10 @@ function ParallelCoordinates() {
             _tempYPositions[axis.key][category] = _tempYPositions[axis.key][category] - width;
 
             var meanValue = {};
-            _gAxes.filter(a => (a.dimension.property == "referential"))
+            _gAxes.filter(a => (a.dimension.property == "categorical"))
                 .each(a => meanValue[a.key] = node.values[0][a.key]);
 
-            _gAxes.filter(a => a.dimension.property == "characteristic")
+            _gAxes.filter(a => a.dimension.property == "quantitative")
                 .each(a => meanValue[a.key] = d3.mean(node.values.filter(d => d[coloredDimension.key] && d[a.key]), d => d[a.key]));
 
             if (!node.isLeaf) {
@@ -1487,7 +1486,7 @@ function ParallelCoordinates() {
             path.push("L");
         }
 
-        _gAxes.filter(a => (a.dimension.isVisible && a.dimension.property == "characteristic"))
+        _gAxes.filter(a => (a.dimension.isVisible && a.dimension.property == "quantitative"))
             .sort(function(a, b) {return d3.ascending(a.dimension.order, b.dimension.order)})
             .each(function (axis, i) {
         
@@ -1520,7 +1519,7 @@ function ParallelCoordinates() {
         
         var extend = [];
         
-        if (axis.dimension.type == "nominal" || axis.dimension.type == "ordinal") {
+        if (axis.dimension.property == "categorical") {
             
             var min = _height;
             axis.domain.forEach(function(cat) {
@@ -1547,7 +1546,7 @@ function ParallelCoordinates() {
                 }
             });
         }
-        if (axis.dimension.type == "quantitative") {
+        if (axis.dimension.property == "quantitative") {
             extend[0] = axis.yScale.invert(brushExtend[0]);
             extend[1] = axis.yScale.invert(brushExtend[1]);
         }

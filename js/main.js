@@ -750,25 +750,27 @@ function getDomain(dim, dataset) {
         domain = (d3.nest()
             .key(d => d[dim.key])
             .entries(dataset)).map(d => d.key);
-        
-        if (dim.key == "TestRec") {
-            domain = domain.sort((a, b) => a.split('_')[0].substring(1,3) - b.split('_')[0].substring(1,3));
-        }
-        else {
 
-            if (dim.key == "WBDurationCategory_RS") {
-                var newDomain = [];
-                ['< 10 seconds', '10-30 seconds', '30-60 seconds', '60-120 seconds', '> 120 seconds', 'none']
-                    .forEach(function (cat) {
-                    if (d3.set(domain).has(cat))
-                        newDomain.push(cat);
-                });
-                domain = newDomain;
-            }
-            else {
-                domain = domain.sort((a, b) => a - b);
-            }
-        }
+        domain = domain.sort((a, b) => a - b);
+        
+        // if (dim.key == "TestRec") {
+        //     domain = domain.sort((a, b) => a.split('_')[0].substring(1,3) - b.split('_')[0].substring(1,3));
+        // }
+        // else {
+
+        //     if (dim.key == "WBDurationCategory_RS") {
+        //         var newDomain = [];
+        //         ['< 10 seconds', '10-30 seconds', '30-60 seconds', '60-120 seconds', '> 120 seconds', 'none']
+        //             .forEach(function (cat) {
+        //             if (d3.set(domain).has(cat))
+        //                 newDomain.push(cat);
+        //         });
+        //         domain = newDomain;
+        //     }
+        //     else {
+        //         domain = domain.sort((a, b) => a - b);
+        //     }
+        // }
     }
     else {
         // if (dim.nature == "measured")
@@ -782,8 +784,8 @@ function getDomain(dim, dataset) {
         // }
     }
 
-    if (dim.type == "ordinal") {
-    }
+    // if (dim.type == "ordinal") {
+    // }
 
     return domain;
 }

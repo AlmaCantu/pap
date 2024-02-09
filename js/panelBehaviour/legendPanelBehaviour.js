@@ -94,7 +94,7 @@ function LegendPanelBehaviour () {
         //     .text((coloredDimension.label ? coloredDimension.label : coloredDimension.key));
 
 
-        if (coloredDimension.property == "referential") {
+        if (coloredDimension.property == "categorical") {
     
             var categories = coloredDimension.domain;
             // var coloredDimension.colorScale = getcoloredDimension.colorScale(coloredDimension);

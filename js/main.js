@@ -29,14 +29,11 @@ var dataChangedEventListeners = [];
 var selectedDimensionsChangedEventListeners = [];
 
 var coloredDimension;
-// var shapeDimension;
 var selectedDimension1;
 var selectedDimension2;
-// var selectedDimensions;
 
 var correlationPlotPanel;
 var blandAltmanPlotPanel;
-
 
 var parallelCoordinatesBehaviour;
 var visibleDimensionsPanelBehaviour;
@@ -57,8 +54,6 @@ var currentData;
 var treeData;
 var displayedData;
 
-// var isBackground = [];
-
 var dataFormatReader;
 var dataReader;
 
@@ -69,8 +64,8 @@ var isMerged = false;
 // var totalSize;
 
 var displayOrder = [];
-displayOrder["referential"] = 0;
-displayOrder["characteristic"] = 1;
+displayOrder["categorical"] = 0;
+displayOrder["quantitative"] = 1;
 
 const icon_chart_line = '\uf201';
 const icon_chart_bar = '\uf080';
@@ -113,25 +108,67 @@ function uploadData(fileData) {
 function readCsvData(csvData) {
     
     fullData = csvData;
-    // console.log(fullData);
     console.log("-- Data loaded");
 
     console.log("Extact dimensions...");
-    dimensions = [];
+    this.dimensions = [];
     var keys = d3.keys(fullData[0]);
+    
+    var catIdx = 0;
+    var quantIdx = 0;
+    var maxLength = fullData.length;
+    var valueIdx;
     keys.forEach(function(k) {
-        // console.log(k);
-        var newDim = {};
-        newDim.key = k;
-        newDim.property = "characteristic";
-        newDim.type = "quantitative";
-        newDim.nature = "measured";
-        newDim.isVisible = true;
-        dimensions.push(newDim);
+
+        var dim = {};
+
+        // key
+        dim.key = k;
+        
+        // property
+        var val;
+        valueIdx = 0;
+        while ((valueIdx < maxLength) && (typeof val === 'undefined')) {
+            val = fullData[valueIdx][k];
+            valueIdx++;
+        }
+        if (typeof val === 'undefined') return;
+        if (isNaN(parseFloat(val))) {
+            dim.property = "categorical";
+            dim.type = "nominal";
+            catIdx++;
+        }
+        else {
+            
+            var groupedData = d3.nest()
+                .key(d => d[k])
+                .entries(fullData);
+
+            if (groupedData.length < 8) {
+                dim.property = "categorical";
+                dim.type = "ordinal";
+                catIdx++;
+            }
+            else {
+                dim.property = "quantitative";
+                dim.type = "quantitative";
+                quantIdx++;
+            }
+        }
+
+        // is visible
+        dim.isVisible = (((dim.property == "categorical") && (catIdx < 4))
+            || ((dim.property == "quantitative") && (quantIdx < 6)));
+
+        dim.domain = [];
+
+        dimensions.push(dim);
     });
     console.log("-- Dimensions initialized");
+    // console.log(dimensions);
 
-    loadData();
+    // loadData();
+    onDataReady();
 }
 
 function loadData() {
@@ -143,14 +180,14 @@ function loadData() {
 
 function onDataReady() {
 
-    dimensions = dataFormatReader.dimensions;
+    // dimensions = dataFormatReader.dimensions;
 
     fullData.forEach(function(d) {
         dimensions.forEach(function(dim) {
-            if (dim.property == "referential")
+            if (dim.property == "categorical")
                 if (!d[dim.key] || d[dim.key] == "NaN")
                     d[dim.key] = "none";
-            if (dim.property == "characteristic")
+            if (dim.property == "quantitative")
                 if (d[dim.key] == "NaN")
                     d[dim.key] = null;
         });
@@ -160,11 +197,11 @@ function onDataReady() {
     console.log("Inital Visibles Dimensions: " + visibleDim.map (d => d.key));
 
     // Preselection
-    var visibleRefDim = dimensions.filter(dim => dim.isVisible && dim.property == "referential");
+    var visibleRefDim = dimensions.filter(dim => dim.isVisible && dim.property == "categorical");
     coloredDimension = visibleRefDim[0];
     console.log("Inital Colored Dimension: " + coloredDimension.key);
 
-    var visibleCharDim = dimensions.filter(dim => dim.isVisible && dim.property == "characteristic");
+    var visibleCharDim = dimensions.filter(dim => dim.isVisible && dim.property == "quantitative");
     selectedDimension1 = visibleCharDim[0];
     if (visibleCharDim.length > 1)
         selectedDimension2 = visibleCharDim[1];
@@ -299,7 +336,7 @@ function onColoredDimensionChange(newColoredDimension) {
     // update color scale
     updateColorScale();
 
-    if (newColoredDimension.property == "referential") {
+    if (newColoredDimension.property == "categorical") {
         
         // update axes order putting color first
         coloredDimension.order = 1;
@@ -437,7 +474,7 @@ function onAxisMoved() {
         .sort((dimA, dimB) => d3.ascending(displayOrder[dimA.property], displayOrder[dimB.property]))
         .forEach((dim, i) => dim.order = i+1);
     
-    if(coloredDimension.property =="referential" && coloredDimension.order != 1) {
+    if(coloredDimension.property =="categorical" && coloredDimension.order != 1) {
         // update the colored value
         dimensions.forEach(dim => {if (dim.order == 1) coloredDimension = dim;});
 
@@ -487,7 +524,7 @@ function onMergingStateChange() {
 // Other methods
 
 function updateColorScale() {
-    dimensions.filter(dim => dim.property == "characteristic").forEach(dim => dim.colorScale = getColorScale(dim, getDomain(dim, currentData)));
+    dimensions.filter(dim => dim.property == "quantitative").forEach(dim => dim.colorScale = getColorScale(dim, getDomain(dim, currentData)));
 }
 
 function checkFileExist(urlToFile) {
@@ -529,7 +566,7 @@ function computeDomain(dim, dataset) {
 
     var domain;
 
-    if (dim.property == "referential") {
+    if (dim.property == "categorical") {
         domain = (d3.nest()
             .key(d => d[dim.key])
             .entries(dataset)).map(d => d.key)
@@ -554,15 +591,15 @@ function computeDomain(dim, dataset) {
         }
     }
     else {
-        if (dim.nature == "measured")
+        // if (dim.nature == "measured")
             var k = dim.key;
             domain = d3.extent(dataset.filter(d => (d[k] && !isNaN(d[k]) && d[k] != null)), function(d) { return +d[k]; });
 
-        if (dim.nature == "computed") {
-            // if (dim.parameters.min && dim.parameters.max)
-            var k = dim.parameters.mean;
-            domain = d3.extent(dataset.filter(d => (d[k] && !isNaN(d[k]) && d[k] != null)), function(d) { return +d[k]; });
-        }
+        // if (dim.nature == "computed") {
+        //     // if (dim.parameters.min && dim.parameters.max)
+        //     var k = dim.parameters.mean;
+        //     domain = d3.extent(dataset.filter(d => (d[k] && !isNaN(d[k]) && d[k] != null)), function(d) { return +d[k]; });
+        // }
     }
 
     if (dim.type == "ordinal") {
@@ -611,7 +648,7 @@ function getCategoricalScale(dim, dataset, range, totalMargin) {
 
 //     // console.log(dim.key);
 //     // console.log(dim.type);
-//     if (dim.property == "referential") {
+//     if (dim.property == "categorical") {
         
 //         var n = dim.domain.length;
 
@@ -708,7 +745,7 @@ function getDomain(dim, dataset) {
 
     var domain;
 
-    if (dim.property == "referential") {
+    if (dim.property == "categorical") {
 
         domain = (d3.nest()
             .key(d => d[dim.key])
@@ -734,15 +771,15 @@ function getDomain(dim, dataset) {
         }
     }
     else {
-        if (dim.nature == "measured")
+        // if (dim.nature == "measured")
             var k = dim.key;
             domain = d3.extent(dataset.filter(d => (d[k] && !isNaN(d[k]) && d[k] != null)), function(d) { return +d[k]; });
 
-        if (dim.nature == "computed") {
-            // if (dim.parameters.min && dim.parameters.max)
-            var k = dim.parameters.mean;
-            domain = d3.extent(dataset.filter(d => (d[k] && !isNaN(d[k]) && d[k] != null)), function(d) { return +d[k]; });
-        }
+        // if (dim.nature == "computed") {
+        //     // if (dim.parameters.min && dim.parameters.max)
+        //     var k = dim.parameters.mean;
+        //     domain = d3.extent(dataset.filter(d => (d[k] && !isNaN(d[k]) && d[k] != null)), function(d) { return +d[k]; });
+        // }
     }
 
     if (dim.type == "ordinal") {
@@ -755,7 +792,7 @@ function getColorScale(dim, domain) {
 
     var scale;
 
-    if (dim.property == "referential") {
+    if (dim.property == "categorical") {
 
         var index = domain.indexOf('');
         if (index > -1) {
@@ -922,10 +959,10 @@ function updateCurrentData() {
             if (dim.brush.length !== 0) {
 
                 switch(dim.property) {
-                    case "referential":
+                    case "categorical":
                         isBrushed = d3.set(dim.brush).has(d[dim.key]);
                         break;
-                    case "characteristic":
+                    case "quantitative":
                         isBrushed = !d[dim.key] || (dim.brush[0] <= d[dim.key] && d[dim.key] <= dim.brush[1]);
                         break;
                     default:
@@ -1007,7 +1044,7 @@ function updateTreeAndDisplayedData() {
             if (isMerged) {
                 var meanValue = {};
                 dimensions.forEach(function(dim) {
-                    if(dim.property == "referential") {
+                    if(dim.property == "categorical") {
                         meanValue[dim.key] = data[0][dim.key];
                     }
                     else {
@@ -1026,7 +1063,7 @@ function updateTreeAndDisplayedData() {
         }
     }
 
-    treeData = rec(currentData, dimensions.filter(dim => dim.isVisible && dim.property == "referential")
+    treeData = rec(currentData, dimensions.filter(dim => dim.isVisible && dim.property == "categorical")
         .sort((dimA, dimB) => d3.ascending(dimA.order, dimB.order))
         .slice(0));
 }

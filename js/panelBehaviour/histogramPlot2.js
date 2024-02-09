@@ -164,7 +164,7 @@ function Histogram2 () {
 
         _binsList = [];
         
-        if (coloredDimension.property == "referential") {
+        if (coloredDimension.property == "categorical") {
             var categories = coloredDimension.domain;
             // console.log(categories);
             categories.forEach(function (cat) {
@@ -236,7 +236,7 @@ function Histogram2 () {
                     .style("opacity", 0.6);
         });
         
-        // if (coloredDimension.property == "referential")
+        // if (coloredDimension.property == "categorical")
         //     _binsList.forEach(function (b, i) {
 
         //         _gSelectedBins.append("path")
@@ -271,12 +271,12 @@ function Histogram2 () {
 
         _gSelectedBins.selectAll(".hist")
             .attr("fill", function (dta) {
-                if (coloredDimension.property == "referential") {
+                if (coloredDimension.property == "categorical") {
                     if (dta.length > 0)
                         return (dta[0][coloredDimension.key] ? coloredDimension.colorScale(dta[0][coloredDimension.key]) : nanColor);
                     return;
                 }
-                if (coloredDimension.property == "characteristic") {
+                if (coloredDimension.property == "quantitative") {
                     return (coloredDimension.colorScale(d3.mean(dta, d => d[coloredDimension.key])));
                     // return _colorScale(d3.mean(dta, d => d[coloredDimension.key]));
                 }

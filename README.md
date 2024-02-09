@@ -20,4 +20,4 @@ Navigate to the root folder of the project and run
 ### Step 2 - Access the software
 
 By default, this will run the contents of the directory on a local web server, on port 8000. You can go to this server by going to the URL
-'http://localhost:4200/'
+'http://localhost:8000/'

@@ -144,10 +144,17 @@ function readCsvData(csvData) {
                 .key(d => d[k])
                 .entries(fullData);
 
-            if (groupedData.length < 8) {
-                dim.property = "categorical";
-                dim.type = "ordinal";
-                catIdx++;
+            if (groupedData.length < 15) {
+                if (groupedData.length > (maxLength / 3)) {
+                    dim.property = "quantitative";
+                    dim.type = "quantitative";
+                    quantIdx++;  
+                }
+                else {
+                    dim.property = "categorical";
+                    dim.type = "ordinal";
+                    catIdx++;
+                }
             }
             else {
                 dim.property = "quantitative";
